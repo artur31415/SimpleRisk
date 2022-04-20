@@ -8,6 +8,16 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "Reference",
+"class": "Territory",
+"language": "GDScript",
+"path": "res://scripts/Territory.gd"
+} ]
+_global_script_class_icons={
+"Territory": ""
+}
+
 [application]
 
 config/name="SimpleRisk"
