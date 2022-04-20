@@ -5,3 +5,4 @@
 [node name="MainN2D" type="Node2D"]
 
 [node name="Territory2D" parent="." instance=ExtResource( 1 )]
+position = Vector2( 40, 40 )
