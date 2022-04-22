@@ -1,10 +1,10 @@
 extends Node2D
 
 
-var currentTerritory
+var myTerritory
 
 func create(_terr, _position):
-	currentTerritory = _terr
+	myTerritory = _terr
 	position = _position
 
 # Called when the node enters the scene tree for the first time.
@@ -21,7 +21,7 @@ func _on_StaticBody2D_input_event(viewport, event, shape_idx):
 	if event is InputEventMouseButton \
 		and event.button_index == BUTTON_LEFT \
 		and event.pressed:
-		print(currentTerritory.Name)
+		print(myTerritory.Name)
 
 	# if event is InputEventScreenTouch and event.is_pressed():
 	# 	print("here3")
