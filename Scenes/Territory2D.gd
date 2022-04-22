@@ -3,6 +3,10 @@ extends Node2D
 
 var myTerritory
 
+signal territory_selected
+
+var IsSelected = false
+
 func create(_terr, _position):
 	myTerritory = _terr
 	position = _position
@@ -22,6 +26,7 @@ func _on_StaticBody2D_input_event(viewport, event, shape_idx):
 		and event.button_index == BUTTON_LEFT \
 		and event.pressed:
 		print(myTerritory.Name)
+		emit_signal("territory_selected", myTerritory.Key)
 
 	# if event is InputEventScreenTouch and event.is_pressed():
 	# 	print("here3")

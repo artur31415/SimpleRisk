@@ -2,6 +2,10 @@ extends Node2D
 
 var myTroops
 
+signal tank_selected
+
+var IsSelected = false
+
 func create(_troops, _position):
 	myTroops = _troops
 	if _position != null:
@@ -23,3 +27,4 @@ func _on_StaticBody2D_input_event(viewport, event, shape_idx):
 		and event.button_index == BUTTON_LEFT \
 		and event.pressed:
 		print(myTroops.Name)
+		emit_signal("tank_selected", myTroops.Key)
