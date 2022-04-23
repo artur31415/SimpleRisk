@@ -26,5 +26,5 @@ func _on_StaticBody2D_input_event(viewport, event, shape_idx):
 	if event is InputEventMouseButton \
 		and event.button_index == BUTTON_LEFT \
 		and event.pressed:
-		print(myTroops.Name)
+		#print(myTroops.Name)
 		emit_signal("tank_selected", myTroops.Key)
