@@ -28,6 +28,7 @@ func GetTerritorySceneByKey(territory_key):
 	return null
 
 func SelectTankByKey(tank_key):
+	print("SelectTankByKey: ", tank_key)
 	for tankScene in myTanks:
 		tankScene.IsSelected = tankScene.myTroops.Key == tank_key
 		
@@ -65,16 +66,19 @@ func _on_territory_selected(territory_key):
 	if old_selected_terr != null:
 		var selected_tank = GetSelectedTank()
 		if selected_tank != null:
-			#TODO: HANDLE ENEMY FIGHTS!
-			var dest_tank = GetTankSceneByTerritoryKey(territory_key)
-			if dest_tank == null:
-				selected_tank.position = new_selected_terr.position
-			else:
-				dest_tank.myTroops.Count += selected_tank.myTroops.Count
-				myTanks.erase(selected_tank)
-				selected_tank.queue_free()
+			if old_selected_terr != new_selected_terr:
+				#TODO: HANDLE ENEMY FIGHTS!
+				var dest_tank = GetTankSceneByTerritoryKey(territory_key)
+				if dest_tank == null:
+					selected_tank.position = new_selected_terr.position
+				else:
+					dest_tank.myTroops.Count += selected_tank.myTroops.Count
+					dest_tank.update()
+					myTanks.erase(selected_tank)
+					selected_tank.queue_free()
 				
 			SelectTankByKey(null)
+			SelectTerritoryByKey(null)
 
 
 # Called when the node enters the scene tree for the first time.

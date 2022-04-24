@@ -6,11 +6,14 @@ signal tank_selected
 
 var IsSelected = false
 
+func update():
+	get_node("TankRTL").text = str(myTroops.Count)
+
 func create(_troops, _position):
 	myTroops = _troops
 	if _position != null:
 		position = _position	
-	get_node("TankRTL").text = str(myTroops.Count)
+		update()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
