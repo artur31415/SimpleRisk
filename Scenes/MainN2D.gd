@@ -33,6 +33,7 @@ func SelectTankByKey(tank_key):
 		tankScene.IsSelected = tankScene.myTroops.Key == tank_key
 		
 func SelectTerritoryByKey(territory_key):
+	print("SelectTerritoryByKey: ", territory_key)
 	var selected_territory_scene = null
 	for territoryScene in myTerritories:
 		territoryScene.IsSelected = territoryScene.myTerritory.Key == territory_key
@@ -67,6 +68,7 @@ func _on_territory_selected(territory_key):
 		var selected_tank = GetSelectedTank()
 		if selected_tank != null:
 			if old_selected_terr != new_selected_terr:
+				print("here3")
 				#TODO: HANDLE ENEMY FIGHTS!
 				var dest_tank = GetTankSceneByTerritoryKey(territory_key)
 				if dest_tank == null:
