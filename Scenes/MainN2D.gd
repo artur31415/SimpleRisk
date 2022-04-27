@@ -55,9 +55,9 @@ func GetSelectedTerritory():
 
 
 func _on_tank_selected(tank_key):
-	if GetSelectedTank() == null:
-		print("_on_tank_selected: " + tank_key)
-		SelectTankByKey(tank_key)
+	#if GetSelectedTank() == null:
+	print("_on_tank_selected: " + tank_key)
+	SelectTankByKey(tank_key)
 
 #FIXME:
 func _on_territory_selected(territory_key):
@@ -71,9 +71,14 @@ func _on_territory_selected(territory_key):
 				print("here3")
 				#TODO: HANDLE ENEMY FIGHTS!
 				var dest_tank = GetTankSceneByTerritoryKey(territory_key)
-				if dest_tank == null:
+				if dest_tank == null || dest_tank.myTroops.Key == selected_tank.myTroops.Key:
+					var verb = "here4:" + selected_tank.myTroops.Key
+					if dest_tank != null:
+						verb += "::" + dest_tank.myTroops.Key
+					print(verb)
 					selected_tank.position = new_selected_terr.position
-				else:
+				elif dest_tank.myTroops.Key != selected_tank.myTroops.Key:
+					print("here5")
 					dest_tank.myTroops.Count += selected_tank.myTroops.Count
 					dest_tank.update()
 					myTanks.erase(selected_tank)
@@ -85,23 +90,26 @@ func _on_territory_selected(territory_key):
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	for x in range(4):
-		var new_terr = Territory.new("terr_" + str(x), "terr_" + str(x))
-		var new_terr_scene = TerritoryScene.instance()
-		new_terr_scene.create(new_terr, Vector2(40 + x * 80, 40))
-		new_terr_scene.connect("territory_selected", self, "_on_territory_selected")
-		myTerritories.append(new_terr_scene)
-		self.add_child(new_terr_scene)
+	for x in range(10):
+		for y in range(7):
+			if randf() < 0.3:
+				var new_terr = Territory.new("terr_" + str(x) + "_" + str(y), "terr_" + str(x) + "_" + str(y))
+				var new_terr_scene = TerritoryScene.instance()
+				new_terr_scene.create(new_terr, Vector2(40 + x * 80, 40 + y * 80))
+				new_terr_scene.connect("territory_selected", self, "_on_territory_selected")
+				myTerritories.append(new_terr_scene)
+				self.add_child(new_terr_scene)
 
-	for x in range(2):
-		var new_troops = Troops.new("troops_" + str(x), "troops_" + str(x), myTerritories[x].myTerritory.Key, 10 + x * 100)
-		var new_troops_scene = TankScene.instance()
-		new_troops_scene.create(new_troops, myTerritories[x].position)
+	for x in range(len(myTerritories)):
+		if randf() < 0.3:
+			var new_troops = Troops.new("troops_" + str(x), "troops_" + str(x), myTerritories[x].myTerritory.Key, floor(rand_range(50, 1000)))
+			var new_troops_scene = TankScene.instance()
+			new_troops_scene.create(new_troops, myTerritories[x].position)
 
-		new_troops_scene.connect("tank_selected", self, "_on_tank_selected")
+			new_troops_scene.connect("tank_selected", self, "_on_tank_selected")
 
-		myTanks.append(new_troops_scene)
-		add_child(new_troops_scene)
+			myTanks.append(new_troops_scene)
+			add_child(new_troops_scene)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
