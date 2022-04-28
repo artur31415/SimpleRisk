@@ -55,9 +55,10 @@ func GetSelectedTerritory():
 
 
 func _on_tank_selected(tank_key):
-	#if GetSelectedTank() == null:
-	print("_on_tank_selected: " + tank_key)
-	SelectTankByKey(tank_key)
+	var cur_selected = GetSelectedTank()
+	if cur_selected == null || cur_selected.myTroops.Key != tank_key:
+		print("_on_tank_selected: " + tank_key)
+		SelectTankByKey(tank_key)
 
 #FIXME:
 func _on_territory_selected(territory_key):
