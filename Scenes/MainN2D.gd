@@ -9,6 +9,11 @@ const TankScene = preload("res://Scenes/TankN2D.tscn")
 var myTerritories = []
 var myTanks = []
 
+
+
+var last_selected_tank = null
+var last_selected_terr = null
+
 func GetTankSceneByKey(tank_key):
 	for tankScene in myTanks:
 		if tankScene.myTroops.Key == tank_key:
@@ -54,39 +59,20 @@ func GetSelectedTerritory():
 	return null
 
 
-func _on_tank_selected(tank_key):
-	var cur_selected = GetSelectedTank()
-	if cur_selected == null || cur_selected.myTroops.Key != tank_key:
-		print("_on_tank_selected: " + tank_key)
-		SelectTankByKey(tank_key)
-
 #FIXME:
+func _on_tank_selected(tank_key, is_enemy):
+	print("_on_tank_selected: ", tank_key, "; ", is_enemy)
+	if !is_enemy:
+		last_selected_tank = GetSelectedTank()
+		SelectTankByKey(tank_key)
+	print("+")
+
+
 func _on_territory_selected(territory_key):
 	print("_on_territory_selected: " + territory_key)
-	var old_selected_terr = GetSelectedTerritory()
-	var new_selected_terr = SelectTerritoryByKey(territory_key)
-	if old_selected_terr != null:
-		var selected_tank = GetSelectedTank()
-		if selected_tank != null:
-			if old_selected_terr != new_selected_terr:
-				print("here3")
-				#TODO: HANDLE ENEMY FIGHTS!
-				var dest_tank = GetTankSceneByTerritoryKey(territory_key)
-				if dest_tank == null || dest_tank.myTroops.Key == selected_tank.myTroops.Key:
-					var verb = "here4:" + selected_tank.myTroops.Key
-					if dest_tank != null:
-						verb += "::" + dest_tank.myTroops.Key
-					print(verb)
-					selected_tank.position = new_selected_terr.position
-				elif dest_tank.myTroops.Key != selected_tank.myTroops.Key:
-					print("here5")
-					dest_tank.myTroops.Count += selected_tank.myTroops.Count
-					dest_tank.update()
-					myTanks.erase(selected_tank)
-					selected_tank.queue_free()
-				
-			SelectTankByKey(null)
-			SelectTerritoryByKey(null)
+	last_selected_terr = GetSelectedTerritory()
+	SelectTerritoryByKey(territory_key)
+	print("+")
 
 
 # Called when the node enters the scene tree for the first time.
@@ -105,14 +91,51 @@ func _ready():
 		if randf() < 0.3:
 			var new_troops = Troops.new("troops_" + str(x), "troops_" + str(x), myTerritories[x].myTerritory.Key, floor(rand_range(50, 1000)))
 			var new_troops_scene = TankScene.instance()
-			new_troops_scene.create(new_troops, myTerritories[x].position)
+
+			var isEnemy = false
+
+			if randf() < 0.3:
+				isEnemy = true
+
+			new_troops_scene.create(new_troops, myTerritories[x].position, isEnemy)
 
 			new_troops_scene.connect("tank_selected", self, "_on_tank_selected")
+
 
 			myTanks.append(new_troops_scene)
 			add_child(new_troops_scene)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
+func _process(delta):
+	if last_selected_terr != null:
+		var new_selected_terr = GetSelectedTerritory()
+
+		var new_selected_tank = GetSelectedTank()
+
+		print(last_selected_tank, " ; ", new_selected_tank)
+		if new_selected_tank != null:
+			print(new_selected_tank.myTroops.TerritoryKey)
+			if last_selected_terr != new_selected_terr:
+				print("here3")
+				#TODO: HANDLE ENEMY FIGHTS!
+				var dest_tank = GetTankSceneByTerritoryKey(new_selected_terr.myTerritory.Key)
+				if dest_tank == null: # || dest_tank.myTroops.Key == new_selected_tank.myTroops.Key:
+					var verb = "here4:" + new_selected_tank.myTroops.Key
+					# if dest_tank != null:
+					# 	verb += "::" + dest_tank.myTroops.Key
+					print(verb)
+					new_selected_tank.SetTerritory(new_selected_terr)
+				elif dest_tank.myTroops.Key != last_selected_tank.myTroops.Key:
+					print("here5")
+					dest_tank.myTroops.Count += last_selected_tank.myTroops.Count
+					dest_tank.update()
+					myTanks.erase(last_selected_tank)
+					last_selected_tank.queue_free()
+				
+			SelectTankByKey(null)
+			last_selected_tank = null
+
+		SelectTerritoryByKey(null)
+		last_selected_terr = null
+		print("===============================")
