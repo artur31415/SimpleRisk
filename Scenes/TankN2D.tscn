@@ -25,9 +25,13 @@ margin_top = 25.0
 margin_right = 48.0
 margin_bottom = 41.0
 text = "1000"
-__meta__ = {
-"_edit_use_anchors_": false
-}
+
+[node name="TankLVLRTL" type="RichTextLabel" parent="."]
+margin_left = 16.0
+margin_top = 8.0
+margin_right = 64.0
+margin_bottom = 24.0
+text = "1"
 
 [node name="TankEnemyS" type="Sprite" parent="."]
 scale = Vector2( 0.175, 0.175 )

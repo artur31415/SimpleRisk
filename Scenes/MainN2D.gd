@@ -14,7 +14,7 @@ var enemyTanks = []
 var last_selected_tank = null
 var last_selected_terr = null
 
-
+var enemyTanksDestroyied = 0
 
 func GetTankSceneByKey(tank_key):
 	for tankScene in myTanks:
@@ -93,6 +93,23 @@ func _on_territory_selected(territory_key):
 	print("+")
 
 
+func SpawnNewTanks(occupation_prob, is_enemy):
+	for x in range(len(myTerritories)):
+		if randf() < occupation_prob and GetTankSceneByTerritoryKey(myTerritories[x].myTerritory.Key) == null:
+			var troop_name = "troops_" + str(x) + "_" + str(randf())
+			var new_troops = Troops.new(troop_name, troop_name, myTerritories[x].myTerritory.Key, floor(rand_range(50, 1000)))
+			var new_troops_scene = TankScene.instance()
+
+			new_troops_scene.create(new_troops, myTerritories[x].position, is_enemy)
+
+			new_troops_scene.connect("tank_selected", self, "_on_tank_selected")
+
+			if is_enemy:
+				enemyTanks.append(new_troops_scene)
+			else:
+				myTanks.append(new_troops_scene)
+			add_child(new_troops_scene)
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	for x in range(10):
@@ -104,26 +121,9 @@ func _ready():
 				new_terr_scene.connect("territory_selected", self, "_on_territory_selected")
 				myTerritories.append(new_terr_scene)
 				self.add_child(new_terr_scene)
-
-	for x in range(len(myTerritories)):
-		if randf() < 0.3:
-			var new_troops = Troops.new("troops_" + str(x), "troops_" + str(x), myTerritories[x].myTerritory.Key, floor(rand_range(50, 1000)))
-			var new_troops_scene = TankScene.instance()
-
-			var isEnemy = false
-
-			if randf() < 0.3:
-				isEnemy = true
-
-			new_troops_scene.create(new_troops, myTerritories[x].position, isEnemy)
-
-			new_troops_scene.connect("tank_selected", self, "_on_tank_selected")
-
-			if isEnemy:
-				enemyTanks.append(new_troops_scene)
-			else:
-				myTanks.append(new_troops_scene)
-			add_child(new_troops_scene)
+	
+	SpawnNewTanks(0.3, false)
+	SpawnNewTanks(0.2, true)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -135,6 +135,8 @@ func _process(delta):
 		var new_selected_enemy_tank = GetSelectedTank(true)
 
 		print(last_selected_tank, " ; ", new_selected_my_tank, " ; ", new_selected_enemy_tank)
+
+		#HANDLE BATTLE
 		if new_selected_enemy_tank != null:
 			if new_selected_my_tank != null:
 				print("here0")
@@ -145,17 +147,25 @@ func _process(delta):
 				new_selected_enemy_tank.myTroops.Count -= myCount
 
 				if new_selected_my_tank.myTroops.Count <= 0:
+					new_selected_enemy_tank.GainExperience(1)
 					new_selected_enemy_tank.update()
+
 					myTanks.erase(new_selected_my_tank)
 					new_selected_my_tank.queue_free()
+					
 
 				if new_selected_enemy_tank.myTroops.Count <= 0:
 					if new_selected_my_tank.myTroops.Count > 0:
+						new_selected_my_tank.GainExperience(1)
 						new_selected_my_tank.SetTerritory(GetTerritorySceneByKey(new_selected_enemy_tank.myTroops.TerritoryKey))
 						new_selected_my_tank.update()
 					enemyTanks.erase(new_selected_enemy_tank)
 					new_selected_enemy_tank.queue_free()
+					enemyTanksDestroyied += 1
+					if enemyTanks.empty():
+						SpawnNewTanks(0.1, true)
 				
+		#HANDLE PLAYER MOTION
 		elif new_selected_my_tank != null:
 			print(new_selected_my_tank.myTroops.TerritoryKey)
 			if last_selected_terr != new_selected_terr:

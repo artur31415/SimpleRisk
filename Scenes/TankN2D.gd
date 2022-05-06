@@ -14,6 +14,8 @@ func SetTerritory(terr_scene):
 
 func update():
 	get_node("TankRTL").text = str(myTroops.Count)
+	get_node("TankLVLRTL").text = str(myTroops.LVL)
+	#TODO: SHOW EXP
 
 func create(_troops, _position, _IsEnemy):
 	myTroops = _troops
