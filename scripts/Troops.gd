@@ -22,6 +22,9 @@ func _init(_Name, _Key, _TerritoryKey, _Count):
 func GetForce():
     return Count * LVL
 
+func MergeFromAnother(anotherTroops):
+    Count += anotherTroops.Count * (anotherTroops.LVL / LVL)
+
 func GainExperience(experience):
     Experience += experience
     #FIXME: LVL SCHEME

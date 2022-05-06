@@ -115,7 +115,8 @@ func _ready():
 	for x in range(10):
 		for y in range(7):
 			if randf() < 0.3:
-				var new_terr = Territory.new("terr_" + str(x) + "_" + str(y), "terr_" + str(x) + "_" + str(y))
+				var terr_name = "terr_" + str(x) + "_" + str(y) + "_" + str(randf())
+				var new_terr = Territory.new(terr_name, terr_name)
 				var new_terr_scene = TerritoryScene.instance()
 				new_terr_scene.create(new_terr, Vector2(40 + x * 80, 40 + y * 80))
 				new_terr_scene.connect("territory_selected", self, "_on_territory_selected")
@@ -163,14 +164,13 @@ func _process(delta):
 					new_selected_enemy_tank.queue_free()
 					enemyTanksDestroyied += 1
 					if enemyTanks.empty():
-						SpawnNewTanks(0.1, true)
+						SpawnNewTanks(0.2, true)
 				
 		#HANDLE PLAYER MOTION
 		elif new_selected_my_tank != null:
 			print(new_selected_my_tank.myTroops.TerritoryKey)
 			if last_selected_terr != new_selected_terr:
 				print("here3")
-				#TODO: HANDLE ENEMY FIGHTS!
 				var dest_tank = GetTankSceneByTerritoryKey(new_selected_terr.myTerritory.Key)
 				if dest_tank == null: # || dest_tank.myTroops.Key == new_selected_my_tank.myTroops.Key:
 					var verb = "here4:" + new_selected_my_tank.myTroops.Key
@@ -178,6 +178,7 @@ func _process(delta):
 					# 	verb += "::" + dest_tank.myTroops.Key
 					print(verb)
 					new_selected_my_tank.SetTerritory(new_selected_terr)
+				#TODO: IMPROVE THIS MERGING SCHEME
 				elif dest_tank.myTroops.Key != last_selected_tank.myTroops.Key:
 					print("here5")
 					dest_tank.myTroops.Count += last_selected_tank.myTroops.Count
